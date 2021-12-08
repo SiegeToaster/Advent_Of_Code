@@ -1,3 +1,4 @@
+console.time();
 /* Notes
 Lengthi:
 	0: 6
@@ -37,50 +38,47 @@ for (let i = 0; i < input.length; i++) {
 	} // unit signal pattern[4]
 
 	let aValue = findAValue(i);
-	let dValue = findDValue(i);
-	console.log(`A: ${aValue}`);
-	console.log(`D: ${dValue}`);
+	let dValue = findDValue(i, []);
+	let bValue = findBValue(i, dValue);
+	let fValue = findFValue(i);
+	let gValue = findGValue(i, aValue, dValue, []);
+	let eValue = findEValue(i, aValue, gValue);
+	let cValue = findCValue(i, fValue);
 
+	uniqueWhateverNumbers.set(alphebetize([aValue, bValue, cValue, eValue, fValue, gValue].join('')), 0);
+	uniqueWhateverNumbers.set(alphebetize([cValue, fValue].join('')), 1);
+	uniqueWhateverNumbers.set(alphebetize([aValue, cValue, dValue, eValue, gValue].join('')), 2);
+	uniqueWhateverNumbers.set(alphebetize([aValue, cValue, dValue, fValue, gValue].join('')), 3);
+	uniqueWhateverNumbers.set(alphebetize([bValue, cValue, dValue, fValue].join('')), 4);
+	uniqueWhateverNumbers.set(alphebetize([aValue, bValue, dValue, fValue, gValue].join('')), 5);
+	uniqueWhateverNumbers.set(alphebetize([aValue, bValue, dValue, eValue, fValue, gValue].join('')), 6);
+	uniqueWhateverNumbers.set(alphebetize([aValue, cValue, fValue].join('')), 7);
+	uniqueWhateverNumbers.set(alphebetize([aValue, bValue, cValue, dValue, eValue, fValue, gValue].join('')), 8);
+	uniqueWhateverNumbers.set(alphebetize([aValue, bValue, cValue, dValue, fValue, gValue].join('')), 9);
 
+	input[i][0] = uniqueWhateverNumbers;
 } // format [unit signal patterns(map), four digit output value[4]]
-return;
-console.log(input);
-
 
 
 for (let i = 0; i < input.length; i++) {
-	const uniqueWhateverNumbers = new Map();
-	for (let uniqueBS = 0; uniqueBS < 10; uniqueBS++) {
-		const alphebetizedString = alphebetize(input[i][0][uniqueBS]);
-		let stringValue;
-		if (alphebetizedString.length === 2 || alphebetizedString.length === 3 || alphebetizedString.length === 4 || alphebetizedString.length === 7) { // if it's a unique length digit
-			stringValue = wackyDigits.get(alphebetizedString.length);
-		} else {
-			switch (alphebetizedString) {
-				case 'abcdeg': stringValue = 0; break;
-				case 'acdfg': stringValue = 2; break;
-				case 'abcdf': stringValue = 3; break;
-				case 'bcdef': stringValue = 5; break;
-				case 'bcdefg': stringValue = 6; break;
-				case 'abcdef': stringValue = 9; break;
-			}
-		}
-		uniqueWhateverNumbers.set(alphebetizedString, stringValue)
-	}
-	input[i][0] = uniqueWhateverNumbers;
-	console.log(input[i][0])
+	let outputValue = '';
 
 	for (let wtfIsGoinOn = 0; wtfIsGoinOn < 4; wtfIsGoinOn++) {
 		if (input[i][1][wtfIsGoinOn].length === 2 || input[i][1][wtfIsGoinOn].length === 3 || input[i][1][wtfIsGoinOn].length === 4 || input[i][1][wtfIsGoinOn].length === 7) {
-			console.log(`${alphebetize(input[i][1][wtfIsGoinOn])}: ${wackyDigits.get(input[i][1][wtfIsGoinOn].length)}`);
+			// console.log(`${alphebetize(input[i][1][wtfIsGoinOn])}: ${wackyDigits.get(input[i][1][wtfIsGoinOn].length)}`);
+			outputValue += wackyDigits.get(input[i][1][wtfIsGoinOn].length);
 		} else {
-			console.log(`${alphebetize(input[i][1][wtfIsGoinOn])}: ${input[i][0].get(alphebetize(input[i][1][wtfIsGoinOn]))}`);
+			// console.log(`${alphebetize(input[i][1][wtfIsGoinOn])}: ${input[i][0].get(alphebetize(input[i][1][wtfIsGoinOn]))}`);
+			outputValue += input[i][0].get(alphebetize(input[i][1][wtfIsGoinOn]));
 		}
-		console.log('\n')
+		// console.log('\n')
 	}
+	// console.log(outputValue);
+	totalWackyDigits += parseInt(outputValue);
 }
 
 console.log(totalWackyDigits);
+console.timeEnd();
 
 function alphebetize(string) { // spelling is for nerds
 	return string.split('').sort().join('');
@@ -88,6 +86,7 @@ function alphebetize(string) { // spelling is for nerds
 
 function findAValue(i, previousValue) {
 	let aValue = previousValue;
+
 	for (let value of input[i][0]) {
 		if (value.length === 2 || value.length === 3) {
 			if (value.length === 3 && aValue === undefined) aValue = value.split('');
@@ -96,26 +95,130 @@ function findAValue(i, previousValue) {
 			}
 		}
 	}
+
 	if (aValue.length !== 1) return findAValue(i, aValue);
 	return aValue.join('');
 }
 
-function findDValue(i, previousValue) {
-	let dValue = previousValue;
-	console.log(dValue);
+function findBValue(i, dValue, previousValue) {
+	let bValue = previousValue;
+
 	for (let value of input[i][0]) {
-		if (dValue !== undefined && dValue.length === 3) {
-			if (value.length === 4) dValue = dValue.filter(letter => !value.split('').includes(letter));
-		} else {
-			if (value.length === 5) {
-				if (dValue === undefined) {
-					dValue = value.split('');
-				} else {
-					dValue = dValue.filter(letter => !value.split('').includes(letter));
+		if (bValue === undefined && value.length === 4) bValue = value.split('');
+		if (bValue !== undefined) {
+			if (value.length === 2) {
+				bValue = bValue.filter(letter => !value.split('').includes(letter));
+				bValue = bValue.filter(letter => !dValue.split('').includes(letter));
+			}
+		}
+	}
+
+	if (bValue.length !== 1) return findBValue(i, dValue, bValue);
+	return bValue.join('');
+}
+
+function findCValue(i, fValue, oneValue) {
+
+	for (let value of input[i][0]) {
+		if (oneValue === undefined && value.length === 2) {
+			return findCValue(i, fValue, value.split(''));
+		}
+		if (oneValue !== undefined) {
+			return oneValue.filter(letter => !fValue.split('').includes(letter)).join('');
+		}
+	}
+	
+}
+
+function findDValue(i, previousUsedValues, previousValue) {
+	let dValue = previousValue;
+	let usedValues = previousUsedValues;
+
+	for (let value of input[i][0]) {
+		if (dValue !== undefined && dValue.length === 1) return dValue.join('');
+		if (!usedValues.includes(value)) {
+			if (dValue !== undefined && dValue.length === 3) {
+				if (value.length === 4) {
+					usedValues.push(value);
+					dValue = dValue.filter(letter => value.split('').includes(letter));
+				}
+			} else {
+				if (value.length === 5) {
+					usedValues.push(value);
+					if (dValue === undefined) {
+						dValue = value.split('');
+					} else {
+						dValue = dValue.filter(letter => value.split('').includes(letter));
+					}
 				}
 			}
 		}
 	}
-	if (dValue.length !== 1) return findDValue(i, dValue);
+
+	if (dValue.length !== 1) return findDValue(i, usedValues, dValue);
 	return dValue.join('');
+}
+
+function findEValue(i, aValue, gValue, previousValue) {
+	let eValue = previousValue;
+
+	for (let value of input[i][0]) {
+		if (eValue === undefined && value.length === 7) eValue = value.split('');
+		if (eValue !== undefined && value.length === 4) {
+			eValue = eValue.filter(letter => !value.split('').includes(letter));
+			eValue = eValue.filter(letter => !aValue.split('').includes(letter));
+			eValue = eValue.filter(letter => !gValue.split('').includes(letter));
+		}
+	}
+
+	if (eValue.length !== 1) return findEValue(i, aValue, gValue, eValue);
+	return eValue.join('');
+}
+
+function findFValue(i, oneValue, previousValue) {
+	let fValue = previousValue;
+	
+	for (let value of input[i][0]) {
+		if (oneValue === undefined && value.length === 2) {
+			return findFValue(i, value.split(''));
+		}
+		if (oneValue !== undefined) {
+			if (value.length === 6) {
+				const findSix = value.split('').filter(letter => !oneValue.includes(letter));
+				if (findSix.length === 5) {
+					return value.split('').filter(letter => oneValue.includes(letter)).join('');
+					
+				}
+			}
+		}
+	}
+
+	// if (fValue.length !== 1) return findFValue(i, nonSix, fValue);
+	// return fValue.join('');
+}
+
+function findGValue(i, aValue, dValue, previousUsedValues, previousValue) {
+	let gValue = previousValue;
+	let usedValues = previousUsedValues;
+
+	for (let value of input[i][0]) {
+		if (gValue !== undefined && gValue.length === 1) return gValue.join('');
+		if (!usedValues.includes(value)) {
+			if (gValue !== undefined && gValue.length === 3) {
+				gValue = gValue.filter(letter => ![aValue, dValue].includes(letter));
+			} else {
+				if (value.length === 5) {
+					usedValues.push(value);
+					if (gValue === undefined) {
+						gValue = value.split('');
+					} else {
+						gValue = gValue.filter(letter => value.split('').includes(letter));
+					}
+				}
+			}
+		}
+	}
+	
+	if (gValue.length !== 1) return findGValue(i, aValue, dValue, usedValues, gValue);
+	return gValue.join('');
 }
