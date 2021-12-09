@@ -176,8 +176,6 @@ function findEValue(i, aValue, gValue, previousValue) {
 }
 
 function findFValue(i, oneValue, previousValue) {
-	let fValue = previousValue;
-	
 	for (let value of input[i][0]) {
 		if (oneValue === undefined && value.length === 2) {
 			return findFValue(i, value.split(''));
@@ -192,9 +190,6 @@ function findFValue(i, oneValue, previousValue) {
 			}
 		}
 	}
-
-	// if (fValue.length !== 1) return findFValue(i, nonSix, fValue);
-	// return fValue.join('');
 }
 
 function findGValue(i, aValue, dValue, previousUsedValues, previousValue) {
