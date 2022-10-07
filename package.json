@@ -9,6 +9,7 @@
   "author": "Siege",
   "license": "ISC",
   "dependencies": {
+    "blueimp-md5": "^2.19.0",
     "fs": "^0.0.1-security"
   }
 }
